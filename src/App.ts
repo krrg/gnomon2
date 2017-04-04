@@ -2,22 +2,19 @@ import * as path from 'path';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 
-// Creates and configures an ExpressJS web server.
 class App {
 
-    // ref to Express instance
-    public express: express.Application;
+    public app: express.Application;
 
-    //Run configuration methods on the Express instance.
     constructor() {
-        this.express = express();
+        this.app = express();
         this.middleware();
         this.routes();
     }
 
     private middleware(): void {
-        this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({ extended: false }));
+        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.urlencoded({ extended: false }));
     }
 
     private routes(): void {
@@ -31,10 +28,10 @@ class App {
 
         });
         
-        this.express.use('/', router);
+        this.app.use('/', router);
 
     }
 
 }
 
-export default new App().express;
+export default new App().app;

@@ -1,9 +1,13 @@
 import * as http from 'http';
 const debug = require('debug')('gnomon');
-
+import Settings from "./Settings";
 import App from './App';
+import * as chalk from "chalk";
+
+console.warn(chalk.bgWhite.black(`Ensure Redis is running at ${JSON.stringify(Settings.Redis)} or else server may fail!`))
 
 debug('ts-express:server');
+
 
 const port = normalizePort(process.env.PORT || 3000);
 App.set('port', port);
