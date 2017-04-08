@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
+import * as cookieParser from 'cookie-parser';
 
 class App {
 
@@ -13,6 +14,7 @@ class App {
     }
 
     private middleware(): void {
+        this.app.use(cookieParser());
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: false }));
     }
@@ -28,12 +30,16 @@ class App {
 
         });
 
-
         router.get('/login', (req, res) => {
-            if (req.params.email === undefined) {
+            if (req.query.email === undefined) {
                 return res.send(`I am logging you in through Gmail`)
             } else {
-                return res.send(`Okay, I will blindly login as ${req.params.email}`)
+                const email = req.query.email;
+
+                /* Dump a completely insecure garbage cookie over */
+                res.cookie("sessionEmail", email);
+
+                return res.send(`Okay, I will blindly login as ${email}`)
             }
 
         });
@@ -42,13 +48,19 @@ class App {
             // Handle Google coming back to us with stuff.
         })
 
+        router.get('/logout', (req, res) => {
+            res.clearCookie("sessionEmail");
+            return res.send("Logged out.");
+        })
+
         router.get("/clockEvents", (req, res) => {
-            if (req.params.email === undefined) {
-                return res.status(400).send(JSON.stringify({"error": "Missing required parameter `email`"}));
+            let email = null;
+            if (req.query.email === undefined) {
+                email = req.cookies["sessionEmail"]
             }
 
             // Otherwise send back the list of events.
-            return res.send("Not implemented yet");
+            return res.send(`Your email is ${email}`);
         })
 
         router.post("/clock", (req, res) => {

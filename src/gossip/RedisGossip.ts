@@ -4,7 +4,7 @@ import Settings from "../Settings";
 import * as Redis from "ioredis"
 
 export default class RedisGossip implements IGossip {
-    
+
     redis: Redis.Redis;
 
     constructor() {
@@ -17,6 +17,10 @@ export default class RedisGossip implements IGossip {
 
     async filterMessages(senderId: string): Promise<ReadonlyArray<string>> {
         return await this.redis.lrange(senderId, 0, -1);
+    }
+
+    subscribeToSender(senderId: string, callback: (msg: IMessage) => any): void {
+        throw new Error('Method not implemented.');
     }
 
 }
