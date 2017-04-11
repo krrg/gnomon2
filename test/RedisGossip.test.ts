@@ -30,4 +30,26 @@ describe("Redis Gossip implementation", () => {
 
     })
 
+    it("publishes a message on the sender's channel", (done) => {
+        const redis = new RedisGossip();
+
+        /* This wrapper is just so we can avoid returning a promise from the unit test
+            and confusing mocha. */
+        (async () => {
+
+            /* we have to await because it takes a round trip to the server to subscribe */
+            await redis.subscribeToSender("ken@example.com", (msg) => {
+                console.log(msg);
+                done();
+            });
+
+            redis.sendMessage({
+                senderId: "ken@example.com",
+                text: "Hello World"
+            })
+
+        })();
+        
+    })
+
 })

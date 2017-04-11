@@ -6,12 +6,15 @@ import * as Redis from "ioredis"
 export default class RedisGossip implements IGossip {
 
     redis: Redis.Redis;
+    subRedis: Redis.Redis;
 
     constructor() {
         this.redis = new Redis(Settings.Redis);
+        this.subRedis = new Redis(Settings.Redis); // Must use a second connection for subscriptions
     }
 
     async sendMessage(message: IMessage): Promise<number> {
+        this.redis.publish(message.senderId, message.text);
         return await this.redis.rpush(message.senderId, message.text);
     }
 
@@ -19,8 +22,15 @@ export default class RedisGossip implements IGossip {
         return await this.redis.lrange(senderId, 0, -1);
     }
 
-    subscribeToSender(senderId: string, callback: (msg: IMessage) => any): void {
-        throw new Error('Method not implemented.');
+    async subscribeToSender(senderId: string, callback: (msg: IMessage) => any): Promise<void> {
+        await this.subRedis.subscribe(senderId);
+
+        this.subRedis.on('message', function(channel, message) {
+            callback({
+                senderId: channel,
+                text: message
+            });
+        })
     }
 
 }
