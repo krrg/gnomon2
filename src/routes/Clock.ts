@@ -4,8 +4,16 @@ import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 
 import IRouter from "./IRouter";
+import IGossip from "../gossip/IGossip";
+
 
 export default class Clock implements IRouter {
+
+    private gossipImpl: IGossip;
+
+    constructor(gossipImpl: IGossip) {
+        this.gossipImpl = gossipImpl;
+    }
 
     routes(): express.Router {
 

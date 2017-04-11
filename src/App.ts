@@ -38,7 +38,7 @@ class App {
             return res.send("Here is the API!");
         });
 
-        router.use(new Clock().routes());
+        router.use(new Clock(this.gossipImpl).routes());
         router.use(new Login().routes());
         router.use(new Email(this.gossipImpl).routes());
 
