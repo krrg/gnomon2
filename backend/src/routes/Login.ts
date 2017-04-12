@@ -15,6 +15,15 @@ export default class LoginRouter implements IRouter {
                 /* Dump a completely insecure garbage cookie over */
                 res.cookie("sessionEmail", email);
 
+                //todo: attempt to get back data from database and put it in a cookie
+                //data = gossipImpl.filterMessages(email)
+                //if (data == null){
+                    //newSenderID = hash(email) or random string
+                    //defaultDatabaseEntry = Json.stringify({senderID = newSenderID, jobs=[], subscriptions=[]})
+                    //gossipImpl.sendMessage( new Message (senderID =email, text=defaultDatabaseEntry)
+                    //data = gossipImpl.filterMessages(email)
+                //}
+                //res.cookie("userData", data);
                 return res.send(`Okay, I will blindly login as ${email}`)
             }
 
