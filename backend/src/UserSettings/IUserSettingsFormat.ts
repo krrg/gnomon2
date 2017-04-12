@@ -1,6 +1,6 @@
 
 export interface IUserSettingsFormat {
-    readonly signing_Id: string,
+    readonly signing_id: string,
     readonly jobs: Array<string>,
     readonly subscriptions: Array<string>
 }

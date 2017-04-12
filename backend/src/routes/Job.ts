@@ -33,7 +33,7 @@ export default class JobRouter implements IRouter {
                 return res.send(`You are not logged in.`);
             }
 
-            this.userSettings.getSettings(email).then((userSettingsString) =>{
+            this.userSettings.getSettings(email).then((userSettingsString:string) =>{
                 let myUserSettings:IUserSettingsFormat, jobsString:string
                 myUserSettings = JSON.parse(userSettingsString);
                 jobsString = JSON.stringify(myUserSettings.jobs);
@@ -51,8 +51,8 @@ export default class JobRouter implements IRouter {
                 return res.send(`You are not logged in.`);
             }
         
-            this.userSettings.insertNewJobId(email).then((jobId) =>{
-                    return res.send(`${jobId}`);
+            this.userSettings.insertNewJobId(email).then((result:string) =>{
+                    return res.send(`${result}`);
             });
 
         });

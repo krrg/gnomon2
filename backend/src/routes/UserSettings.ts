@@ -29,7 +29,7 @@ export default class UserSettingsRouter implements IRouter {
                 return res.send(`You are not logged in.`);
             }
 
-            this.userSettings.getSettings(email).then((userSettingsString) =>{
+            this.userSettings.getSettings(email).then((userSettingsString:string) =>{
                 return res.send(`${userSettingsString}`);
             })
         })

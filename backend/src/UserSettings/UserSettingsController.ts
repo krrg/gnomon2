@@ -1,7 +1,7 @@
 import IGossip from "../gossip/IGossip";
 import {IMessage} from "../gossip/IGossip";
 import IUserSettingsFormat from "./IUserSettingsFormat";
-import Guid from "./Guid"
+import Guid from "../utils/Guid"
 import * as Redis from "ioredis"
 
 export default class UserSettingsController {
@@ -71,7 +71,7 @@ export default class UserSettingsController {
     private createInitialSettings(): IUserSettingsFormat{
         let defaultSettings:IUserSettingsFormat, newSenderId:string;
         newSenderId = this.createRandomId();
-        defaultSettings = {signing_Id:newSenderId, jobs: new Array<string>(), subscriptions:new Array<string>()};
+        defaultSettings = {signing_id:newSenderId, jobs: new Array<string>(), subscriptions:new Array<string>()};
         return defaultSettings;
     }
     private createRandomId():string

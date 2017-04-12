@@ -5,14 +5,20 @@ import * as cookieParser from 'cookie-parser';
 
 import IRouter from "./IRouter";
 import IGossip from "../gossip/IGossip";
-
+import UserSettingsController from "../UserSettings/UserSettingsController"
+import IUserSettingsFormat from "../UserSettings/IUserSettingsFormat";
+import {IMessage} from "../gossip/IGossip";
+import Guid from "../Utils/Guid"
+import IClockFormat from "../Clock/IClockFormat"
 
 export default class Clock implements IRouter {
 
     private gossipImpl: IGossip;
+    private userSettings: UserSettingsController;
 
     constructor(gossipImpl: IGossip) {
         this.gossipImpl = gossipImpl;
+        this.userSettings = new UserSettingsController(this.gossipImpl);
     }
 
     routes(): express.Router {
@@ -24,30 +30,88 @@ export default class Clock implements IRouter {
             if (req.query.email === undefined) {
                 email = req.cookies["sessionEmail"]
             }
+            if(email === undefined)
+            {
+                return res.send(`You are not logged in.`);
+            }
+            if (req.query.senderId === undefined) {
 
-            //Luke: Does this mean, get all clock events the user submitted or do we include everything they are subscribed to?
-            //Luke: either way it looks like we can use gossipImpl.filterMessages(senderID=??? will the "senderID" field work? or are we to filter on all of the worker IDs?)
-            // Otherwise send back the list of events.
-            return res.send(`Your email is ${email}`);
+                return res.send(`You need to provide a senderId.`);
+            }
+            
+            this.gossipImpl.filterMessages(req.query.senderId).then((clockMessages:ReadonlyArray<string>) =>{
+                return res.send(`${clockMessages}`);
+            });
         })
 
         router.post("/clock", (req, res) => {
-            // Create a new clock event with the logged in user.
-            // Their ID will be in a cookie. They optionally specify the worker id and optionally the timestamp.
-            // Timestamp defaults to current time (Date.now())
-            // Worker ID defaults to their ID
+            let email = null, timestamp = null, workerId=null;
+            if (req.query.email === undefined) {
+                email = req.cookies["sessionEmail"]
+            }
+            if(email === undefined)
+            {
+                return res.send(`You are not logged in.`);
+            }
 
-            //Luke: From what I remember this function should do the following:
-                //get the worker id, or as default, get the first worker id
-                    //if they dont have any worker id, then create one for them?
-                //get the timestamp, or as default, get current time
-                //do gossipImpl.sendMessage(senderID=workerID, text=Json.stringify({owner:workerID, time: timestam   }))
+            if (req.query.timestamp === undefined) {
+                timestamp = Date.now();
+            }
+            else
+            {
+                timestamp = parseInt(req.query.timestamp)
+                if(isNaN(timestamp))
+                {
+                    return res.send(`The timestamp provided is not a number.`);
+                }
+            }
 
-            return res.send("Not implemented yet.");
+            this.userSettings.getSettings(email).then((userSettingsString:string) =>{
+                let myUserSettings:IUserSettingsFormat, jobsString:string
+                myUserSettings = JSON.parse(userSettingsString);
+
+                if (req.query.workerId === undefined) {
+                    if(myUserSettings.jobs.length !== 0)
+                    {
+                        //default to first job
+                        workerId = myUserSettings.jobs[0]
+                    }
+                    else{
+                        return res.send(`You have no jobs to clock in from.`);
+                    }
+                }
+                else
+                {
+                    workerId = req.query.workerId;
+                    if(myUserSettings.jobs.indexOf(workerId) === -1)
+                    {
+                        return res.send(`You have do not have a job with that id.`);
+                    }
+                }
+                //workerId is valid
+                let clockMessage:IMessage;
+                clockMessage = this.createClockMessage(workerId, timestamp);
+                this.gossipImpl.sendMessage(clockMessage).then((indexOfMessage) =>{
+                    return res.send(`The clock message was sent successfully`);
+                });
+            })
         });
 
         return router;
 
     }
 
+    private createClockMessage(workerId:string, timestamp:number):IMessage
+    {
+        let clockMessage:IMessage, clockInData:IClockFormat, message_id:string;
+        message_id = this.createRandomId();
+        clockInData = {worker_id:workerId, timestamp: timestamp, message_id:message_id};
+        clockMessage = {senderId:workerId, text:JSON.stringify(clockInData)};
+        return clockMessage;
+    }
+
+    private createRandomId():string
+    {
+        return Guid.newGuid()
+    }
 }

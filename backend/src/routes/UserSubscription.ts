@@ -32,7 +32,7 @@ export default class UserSubscriptionRouter implements IRouter {
                 return res.send(`You are not logged in.`);
             }
 
-            this.userSettings.getSettings(email).then((userSettingsString) =>{
+            this.userSettings.getSettings(email).then((userSettingsString:string) =>{
                 let myUserSettings:IUserSettingsFormat, subscriptionsString:string
                 myUserSettings = JSON.parse(userSettingsString);
                 subscriptionsString = JSON.stringify(myUserSettings.subscriptions);
@@ -53,8 +53,8 @@ export default class UserSubscriptionRouter implements IRouter {
                 return res.send(`You need to provide a subscriptionId.`);
             }
 
-            this.userSettings.insertNewSubscriptionId(email,req.query.subscriptionId).then((subscriptionId) =>{
-                    return res.send(`${subscriptionId}`);
+            this.userSettings.insertNewSubscriptionId(email,req.query.subscriptionId).then((result:string) =>{
+                    return res.send(`${result}`);
             });
         });
 
