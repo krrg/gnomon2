@@ -8,14 +8,12 @@ export default class NavigationBar extends React.Component {
     render() {
         return (
             <div className="NavigationBar">
-                <h1>Navigatory Exploration Bar</h1>
-
-                <div>
-                    <NavLink to="/login">Login</NavLink>
-                    <NavLink to="/timesheet">timesheet</NavLink>
-                    <NavLink to="/approvals">Approvals</NavLink>
-                    <NavLink to="/emails">Email</NavLink>
-                </div>
+                <ul>
+                    <li><NavLink to="/login">Login</NavLink></li>
+                    <li><NavLink to="/timesheet">Timesheet</NavLink></li>
+                    <li><NavLink to="/approvals">Approvals</NavLink></li>
+                    <li><NavLink to="/emails">Email</NavLink></li>
+                </ul>
             </div>
         )
     }

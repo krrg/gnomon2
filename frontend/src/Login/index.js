@@ -14,7 +14,10 @@ export default class Login extends React.Component {
 
                 <div>
                     <h2>Login through Debug Backdoor</h2>
-                    <a href="#">Debug Backdoor</a>
+                    <form>
+                        <input type='text' name='email' placeholder="email@example.com"/>
+                        <button type='submit'>Backdoor Login</button>
+                    </form>
                 </div>
             </div>
         )
