@@ -22,7 +22,7 @@ export default class RedisGossip implements IGossip {
         return await this.redis.lrange(senderId, 0, -1);
     }
 
-    async filterLastMessage(senderId: string): Promise<ReadonlyArray<string>> {
+    async filterLastMessage(senderId: string): Promise<string> {
         const arrayResult = await this.redis.lrange(senderId, -1, -1);
         if (arrayResult.length === 0) {
             return null;
