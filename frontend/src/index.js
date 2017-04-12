@@ -3,11 +3,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import Root from "./Root";
+import Routes from "./Routes";
 
 document.body.innerHTML += '<div id="ReactAppEntry"></div>';
 
 ReactDOM.render(
-    <Root />,
+    <Routes />,
     document.getElementById('ReactAppEntry')
 )
