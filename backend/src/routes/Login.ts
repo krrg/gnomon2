@@ -1,9 +1,21 @@
 import * as express from "express";
 import IRouter from "./IRouter";
+import UserSettingsController from "../UserSettings/UserSettingsController"
+import IGossip from "../gossip/IGossip";
 
 export default class LoginRouter implements IRouter {
 
+    private gossipImpl: IGossip;
+    private userSettings: UserSettingsController;
+
+    constructor(gossipImpl: IGossip) {
+        this.gossipImpl = gossipImpl;
+        this.userSettings = new UserSettingsController(this.gossipImpl);
+    }
+
+
     routes(): express.Router {
+
         const router = express.Router()
 
         router.get('/login', (req, res) => {
@@ -12,21 +24,20 @@ export default class LoginRouter implements IRouter {
             } else {
                 const email = req.query.email;
 
+                if(email === undefined)
+                {
+                    return res.send(`The email parameter is missing`);
+                }
+
                 /* Dump a completely insecure garbage cookie over */
                 res.cookie("sessionEmail", email);
 
-                //todo: attempt to get back data from database and put it in a cookie
-                //data = gossipImpl.filterMessages(email)
-                //if (data == null){
-                    //newSenderID = hash(email) or random string
-                    //defaultDatabaseEntry = Json.stringify({senderID = newSenderID, jobs=[], subscriptions=[]})
-                    //gossipImpl.sendMessage( new Message (senderID =email, text=defaultDatabaseEntry)
-                    //data = gossipImpl.filterMessages(email)
-                //}
-                //res.cookie("userData", data);
+                this.userSettings.getSettings(email).then((userSettings) =>{
+                    //todo: do we want to do anything with the settings object?
+                })
+
                 return res.send(`Okay, I will blindly login as ${email}`)
             }
-
         });
 
         router.get('/login/return', (req, res) => {

@@ -41,7 +41,7 @@ export default class Clock implements IRouter {
                 //get the worker id, or as default, get the first worker id
                     //if they dont have any worker id, then create one for them?
                 //get the timestamp, or as default, get current time
-                //do gossipImpl.sendMessage(senderID=workerID, text=Json.stringify({owner:workerID, time: timestamp}))
+                //do gossipImpl.sendMessage(senderID=workerID, text=Json.stringify({owner:workerID, time: timestam   }))
 
             return res.send("Not implemented yet.");
         });
