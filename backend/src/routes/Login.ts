@@ -77,7 +77,7 @@ export default class LoginRouter implements IRouter {
                 }
 
                 const token = self.oauth2.accessToken.create(result);
-                var options = {
+                const options = {
                     url: 'https://www.googleapis.com/oauth2/v1/userinfo',
                     headers: {
                         'Content-Type': 'application/json',
