@@ -41,7 +41,7 @@ describe("Redis Gossip implementation", () => {
             })
         });
 
-        console.log(await redis.filterLastMessage("Glummydfg"))
+        console.log(await redis.filterLastMessage("Glummy"))
 
 
     })

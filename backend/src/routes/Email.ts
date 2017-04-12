@@ -2,28 +2,95 @@ import {Router} from "express";
 
 import IRouter from "./IRouter";
 import IGossip from "../gossip/IGossip";
+const debug = require('debug')('gnomon');
+import RedisGossip from "../gossip/RedisGossip";
+const nodemailer = require('nodemailer');
+import Settings from "../Settings";
+
 
 export default class Email implements IRouter {
 
     private gossipImpl: IGossip;
+    private subscriptions: {};
+    private redis: any;
+    private transporter: any;
 
     constructor(gossip: IGossip) {
         this.gossipImpl = gossip;
+        this.subscriptions = {};
+        this.redis = new RedisGossip();
+        this.transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: Settings.Email.username,
+                pass: Settings.Email.password
+            }
+        });
+
+        //Uncomment below to test emailer... but don't send emails to me
+        // this.sendEmail("cwig5945@gmail.com", "You got and email", "Here is a message");
+    }
+
+    sendEmail(to_email: string, subject: string, message: string): void {
+        let mailOptions = {
+            from: 'Time Service <gnomondev@gmail.com>',
+            to: to_email,
+            subject: subject,
+            text: message
+        };
+        this.transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+            console.log('Message %s sent: %s', info.messageId, info.response);
+        });
+    }
+
+    subscribe(email: string): void {
+        this.subscriptions[email] = true;
+        this.redis.subscribeToSender(email, this.handleMessage)
+    }
+
+    unsubscribe(email: string): void {
+        delete this.subscriptions[email];
+        //TODO: Add unsubscribe option
+    }
+
+    handleMessage(msg): void {
+        console.log(msg)
     }
 
     routes(): Router {
         const router = Router();
 
         router.post("/subscriptions/:email", (req, res) => {
-
-            // Do it!  Also, not sure of encoding on email.
-
+            let body = req.body;
+            let subscribe = body["subscribe"]
+            let email = req.params.email;
+            if(subscribe) {
+                this.subscribe(email)
+                let return_obj =  {
+                    "msg": `Emails will be sent regarding messages with Sender Id: ${email}`
+                }
+                res.send(return_obj);
+            }
+            else {
+                this.unsubscribe(email)
+                let return_obj =  {
+                    "msg": `Sender Id has now been unsubscribed: ${email}`
+                }
+                res.send(return_obj);
+            }
         })
 
         router.get("/subscriptions", (req, res) => {
-
-            // List everything that I am subscribed to.
-
+            let keys = [];
+            for (let key in this.subscriptions) {
+                if (this.subscriptions.hasOwnProperty(key)) {
+                    keys.push(key);
+                }
+            }
+            res.send(keys);
         })
 
         return router;
