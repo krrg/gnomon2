@@ -1,7 +1,9 @@
 import React from "react";
+import {BrowserRouter as Router, Route} from "react-router-dom";
+
 import NavigationBar from "./NavigationBar/index.js";
 
-import "./Root.scss";
+import "./index.scss";
 
 export default class Root extends React.Component {
 
@@ -9,7 +11,10 @@ export default class Root extends React.Component {
         return (
             <div>
                 <NavigationBar />
-                Hello World
+                
+                <Router>
+                    <Route path="/" component=>
+                </Router>
             </div>
         )
     }
