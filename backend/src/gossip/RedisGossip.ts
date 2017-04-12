@@ -22,6 +22,15 @@ export default class RedisGossip implements IGossip {
         return await this.redis.lrange(senderId, 0, -1);
     }
 
+    async filterLastMessage(senderId: string): Promise<ReadonlyArray<string>> {
+        const arrayResult = await this.redis.lrange(senderId, -1, -1);
+        if (arrayResult.length === 0) {
+            return null;
+        } else {
+            return arrayResult[0];
+        }
+    }
+
     async subscribeToSender(senderId: string, callback: (msg: IMessage) => any): Promise<void> {
         await this.subRedis.subscribe(senderId);
 
