@@ -3,22 +3,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import NavigationBar from "./NavigationBar/index.js";
-
-import "./index.scss";
-
-class Root extends React.Component {
-
-    render() {
-        return (
-            <div>
-                <NavigationBar />
-                Hello World
-            </div>
-        )
-    }
-
-}
+import Root from "./Root";
 
 document.body.innerHTML += '<div id="ReactAppEntry"></div>';
 
