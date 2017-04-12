@@ -13,10 +13,11 @@ export default class UserSettingsController {
     }
 
     async getSettings(email: string): Promise<string> {
-        //todo: use new redis function for filterLastMessage
-        let settingsList:Array<string>, currentSettings:string;
-        settingsList = await this.gossipImpl.filterMessages(email);
-        if(settingsList.length == 0)
+        
+        let currentSettings:string;
+        currentSettings = await this.gossipImpl.filterLastMessage(email);
+
+        if(currentSettings === null)
         {
             let newUserSettings:IUserSettingsFormat, indexOfMessage:number;
             newUserSettings = this.createInitialSettings();
@@ -24,7 +25,6 @@ export default class UserSettingsController {
             return this.getSettings(email)
         }
 
-        currentSettings = settingsList[settingsList.length-1]
         return currentSettings;
     }
 
@@ -34,10 +34,31 @@ export default class UserSettingsController {
         jobId = this.createRandomId();
         userSettingsString = await this.getSettings(email);
         userSettings = JSON.parse(userSettingsString);
-        userSettings.jobs.push(jobId);
+        if(userSettings.jobs.indexOf(jobId) === -1){
+            userSettings.jobs.push(jobId);
+            indexOfMessage = await this.UpdateSettingsObject(email,userSettings);
+            return jobId;
+        }
+        else
+        {
+            await this.insertNewJobId(email);
+        }
+    }
 
-        indexOfMessage = await this.UpdateSettingsObject(email,userSettings);
-        return jobId;
+    async insertNewSubscriptionId(email:string, subscriptionId:string):Promise<string>
+    {
+        let indexOfMessage:number, userSettingsString:string, userSettings:IUserSettingsFormat;
+        userSettingsString = await this.getSettings(email);
+        userSettings = JSON.parse(userSettingsString);
+        if(userSettings.subscriptions.indexOf(subscriptionId) === -1){
+            userSettings.subscriptions.push(subscriptionId);
+            indexOfMessage = await this.UpdateSettingsObject(email,userSettings);
+            return subscriptionId;
+        }
+        else
+        {
+            return `This subscriptionId is already subscribed: ${subscriptionId}`;
+        }
     }
 
     private async UpdateSettingsObject(email:string, userSettings: IUserSettingsFormat): Promise<number>

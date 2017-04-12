@@ -8,8 +8,7 @@ import IGossip from "../gossip/IGossip";
 import UserSettingsController from "../UserSettings/UserSettingsController"
 import IUserSettingsFormat from "../UserSettings/IUserSettingsFormat";
 
-
-export default class JobRouter implements IRouter {
+export default class UserSubscriptionRouter implements IRouter {
 
     private gossipImpl: IGossip;
     private userSettings: UserSettingsController;
@@ -23,7 +22,7 @@ export default class JobRouter implements IRouter {
 
         let router = express.Router();
 
-        router.get("/jobs", (req, res) => {
+        router.get("/userSubscription", (req, res) => {
             let email = null;
             if (req.query.email === undefined) {
                 email = req.cookies["sessionEmail"]
@@ -34,14 +33,14 @@ export default class JobRouter implements IRouter {
             }
 
             this.userSettings.getSettings(email).then((userSettingsString) =>{
-                let myUserSettings:IUserSettingsFormat, jobsString:string
+                let myUserSettings:IUserSettingsFormat, subscriptionsString:string
                 myUserSettings = JSON.parse(userSettingsString);
-                jobsString = JSON.stringify(myUserSettings.jobs);
-                return res.send(`${jobsString}`);
+                subscriptionsString = JSON.stringify(myUserSettings.subscriptions);
+                return res.send(`${subscriptionsString}`);
             })
         })
 
-        router.post("/job", (req, res) => {
+        router.post("/userSubscription", (req, res) => {
             let email = null;
             if (req.query.email === undefined) {
                 email = req.cookies["sessionEmail"]
@@ -50,11 +49,13 @@ export default class JobRouter implements IRouter {
             {
                 return res.send(`You are not logged in.`);
             }
-        
-            this.userSettings.insertNewJobId(email).then((jobId) =>{
-                    return res.send(`${jobId}`);
-            });
+            if (req.query.subscriptionId === undefined) {
+                return res.send(`You need to provide a subscriptionId.`);
+            }
 
+            this.userSettings.insertNewSubscriptionId(email,req.query.subscriptionId).then((subscriptionId) =>{
+                    return res.send(`${subscriptionId}`);
+            });
         });
 
         return router;
