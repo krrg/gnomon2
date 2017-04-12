@@ -2,12 +2,17 @@
 
 
 .NavigationBar {
+
+    h1 {
+        margin: 0;
+    }
+
     @extend .material-layer;
 
     background-color: #EFEFEF;
     width: 100%;
     margin: 0px;
 
-    position: absolute;
+    position: relative;
     top: 0;
 }
