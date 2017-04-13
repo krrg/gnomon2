@@ -61,7 +61,7 @@ export default class LoginRouter implements IRouter {
                 /* Dump a completely insecure garbage cookie over */
                 res.cookie("sessionEmail", email);
 
-                return res.send(`Okay, I will blindly login as ${email}`)
+                return res.redirect("/");
             }
         });
 
@@ -103,7 +103,7 @@ export default class LoginRouter implements IRouter {
 
         router.get('/logout', (req, res) => {
             res.clearCookie("sessionEmail");
-            return res.send("Logged out.");
+            return res.redirect("/");
         })
 
         return router;

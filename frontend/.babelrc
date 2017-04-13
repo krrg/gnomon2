@@ -1,3 +1,14 @@
 {
-  "plugins": ["transform-react-jsx"]
+    "presets": [
+        "react",
+        ["es2015", {"modules": false}]        
+    ],
+    "plugins": [
+        "transform-class-properties",
+        ["transform-async-to-module-method", {
+            "module": "bluebird",
+            "method": "coroutine"
+        }],
+        "react-hot-loader/babel"  
+    ]
 }

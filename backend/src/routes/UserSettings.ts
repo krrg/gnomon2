@@ -26,7 +26,7 @@ export default class UserSettingsRouter implements IRouter {
             }
             if(!email)
             {
-                return res.send(`You are not logged in.`);
+                return res.send(401, {});
             }
 
             this.userSettings.getSettings(email).then((userSettingsString:string) =>{

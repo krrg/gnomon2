@@ -21,19 +21,23 @@
             float: left;
 
             a[href] {
+                color: #222;
                 display: block;
                 padding: 14px 16px;
-                text-decoration: none;
+                // text-decoration: none;
             }
 
             border-left: 1px solid #999;
             border-right: 0;
+            border-bottom: 2px solid rgba(0, 0, 0, 0);
             &:last-child {
                 border-right: 1px solid #999
             }
 
             &:hover {
                 background: white;
+                border-bottom: 2px solid black;
+                padding-bottom: -2px;
             }
         }
     }
