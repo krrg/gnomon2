@@ -116,6 +116,7 @@ export default class Clock implements IRouter {
                 this.gossipImpl.filterMessages(senderId).then((clockMessages:ReadonlyArray<string>) =>{
                     let clockMessage:IMessage, clockDataToSign:IClockFormat;
                     clockDataToSign = this.findClockMessageWithId(clockMessages, messageId)
+
                     if(clockDataToSign === null)
                     {
                         return res.send(`The clock event specified does not exist.`);
