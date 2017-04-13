@@ -8,7 +8,7 @@ import IGossip from "../gossip/IGossip";
 import UserSettingsController from "../UserSettings/UserSettingsController"
 import IUserSettingsFormat from "../UserSettings/IUserSettingsFormat";
 import {IMessage} from "../gossip/IGossip";
-import Guid from "../Utils/Guid"
+import Guid from "../utils/Guid"
 import IClockFormat from "../Clock/IClockFormat"
 
 export default class Clock implements IRouter {
