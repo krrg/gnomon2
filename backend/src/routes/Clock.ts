@@ -37,7 +37,7 @@ export default class Clock implements IRouter {
         })
 
         router.post("/clock", (req, res) => {
-            let email = req.query.email, timestamp = null, workerId=null;
+            let email = req.body["email"], timestamp = req.body["timestamp"], workerId=req.body["workerId"];
             if (!email) {
                 email = req.cookies["sessionEmail"]
             }
@@ -46,12 +46,12 @@ export default class Clock implements IRouter {
                 return res.send(`You are not logged in.`);
             }
 
-            if (req.query.timestamp === undefined) {
+            if (!timestamp) {
                 timestamp = Date.now();
             }
             else
             {
-                timestamp = parseInt(req.query.timestamp)
+                timestamp = parseInt(timestamp)
                 if(isNaN(timestamp))
                 {
                     return res.send(`The timestamp provided is not a number.`);
@@ -62,7 +62,7 @@ export default class Clock implements IRouter {
                 let myUserSettings:IUserSettingsFormat, jobsString:string
                 myUserSettings = JSON.parse(userSettingsString);
 
-                if (req.query.workerId === undefined) {
+                if (!workerId) {
                     if(myUserSettings.jobs.length !== 0)
                     {
                         //default to first job
@@ -74,7 +74,6 @@ export default class Clock implements IRouter {
                 }
                 else
                 {
-                    workerId = req.query.workerId;
                     if(myUserSettings.jobs.indexOf(workerId) === -1)
                     {
                         return res.send(`You have do not have a job with that id.`);
@@ -90,7 +89,7 @@ export default class Clock implements IRouter {
         });
 
         router.post("/signClockEvent", (req, res) => {
-            let email = req.query.email;
+            let email = req.body["email"], messageId = req.body["messageId"], senderId = req.body["senderId"];
             if (!email) {
                 email = req.cookies["sessionEmail"]
             }
@@ -98,20 +97,18 @@ export default class Clock implements IRouter {
             {
                 return res.send(`You are not logged in.`);
             }
-            if (req.query.messageId === undefined) {
+            if (!messageId) {
                 return res.send(`You need to provide a messageId to sign.`);
             }
-            if (req.query.senderId === undefined) {
+            if (!senderId) {
                 return res.send(`You need to provide a senderId (the owner of the message, or previous signer).`);
             }
 
             this.userSettings.getSettings(email).then((userSettingsString:string) =>{
-                let myUserSettings:IUserSettingsFormat, signingId:string, messageId:string, senderId:string;
+                let myUserSettings:IUserSettingsFormat, signingId:string;
                 myUserSettings = JSON.parse(userSettingsString);
                 
                 signingId = myUserSettings.signing_id;
-                messageId = req.query.messageId;
-                senderId = req.query.senderId;
 
                 this.gossipImpl.filterMessages(senderId).then((clockMessages:ReadonlyArray<string>) =>{
                     let clockMessage:IMessage, clockDataToSign:IClockFormat;
@@ -137,9 +134,7 @@ export default class Clock implements IRouter {
 
     }
 
-
-
-    private createClockMessage( workerId:string, timestamp:number):IMessage
+    private createClockMessage(workerId:string, timestamp:number):IMessage
     {
         let clockMessage:IMessage, clockInData:IClockFormat, message_id:string;
         message_id = this.createRandomId();
@@ -150,8 +145,13 @@ export default class Clock implements IRouter {
 
     private findClockMessageWithId(clockMessages:ReadonlyArray<string>, messageId:string):IClockFormat
     {
+
         let myClockInData:IClockFormat = null;
         clockMessages.forEach(clockMessage => {
+            console.log(`${clockMessage}`);
+            console.log(messageId);
+            console.log("messageId");
+
             if(myClockInData != null)
             {
                 return;
@@ -160,6 +160,7 @@ export default class Clock implements IRouter {
             clockInData = JSON.parse(clockMessage);
             if(clockInData.message_id == messageId)
             {
+                console.log("trying")
                 myClockInData = clockInData;
             }
         });

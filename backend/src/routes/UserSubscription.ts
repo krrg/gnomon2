@@ -41,19 +41,19 @@ export default class UserSubscriptionRouter implements IRouter {
         })
 
         router.post("/userSubscription", (req, res) => {
-            let email = req.query.email;
+            let email = req.body.email, subscriptionId = req.body["subscriptionId"];
             if (!email) {
                 email = req.cookies["sessionEmail"]
             }
-            if(!email)
-            {
+            if(!email){
                 return res.send(`You are not logged in.`);
             }
-            if (req.query.subscriptionId === undefined) {
+            if (!subscriptionId) {
+                console.log(req.body)
                 return res.send(`You need to provide a subscriptionId.`);
             }
 
-            this.userSettings.insertNewSubscriptionId(email,req.query.subscriptionId).then((result:string) =>{
+            this.userSettings.insertNewSubscriptionId(email,subscriptionId).then((result:string) =>{
                     return res.send(`${result}`);
             });
         });
