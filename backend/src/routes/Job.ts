@@ -5,8 +5,8 @@ import * as cookieParser from 'cookie-parser';
 
 import IRouter from "./IRouter";
 import IGossip from "../gossip/IGossip";
-import UserSettingsController from "../UserSettings/UserSettingsController"
-import IUserSettingsFormat from "../UserSettings/IUserSettingsFormat";
+import UserSettingsController from "../usersettings/UserSettingsController"
+import IUserSettingsFormat from "../usersettings/IUserSettingsFormat";
 
 
 export default class JobRouter implements IRouter {
@@ -41,8 +41,8 @@ export default class JobRouter implements IRouter {
             })
         })
 
-        router.post("/job", (req, res) => {
-            let email = req.params.email;
+        router.post("/jobs", (req, res) => {
+            let email = req.body["email"];
             if (!email) {
                 email = req.cookies["sessionEmail"]
             }

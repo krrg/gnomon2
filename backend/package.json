@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start": "gulp scripts && DEBUG=gnomon node dist/index.js",
+    "start": "gulp scripts && node dist/index.js",
     "test": "mocha --reporter spec --compilers ts:ts-node/register 'test/**/*.test.ts'"
   },
   "author": "Ken Reese, Luke Dickinson, Curtis Wigington",
