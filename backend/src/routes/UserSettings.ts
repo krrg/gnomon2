@@ -26,7 +26,7 @@ export default class UserSettingsRouter implements IRouter {
             }
             if(!email)
             {
-                return res.send(401, {});
+                return res.status(401).send();
             }
 
             this.userSettings.getSettings(email).then((userSettingsString:string) =>{

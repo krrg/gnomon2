@@ -4,44 +4,15 @@ import axios from "axios";
 
 export default class Login extends React.Component {
 
-    constructor() {
-        super();
-        this.state = {
-            userSettings: null
-        }
-
-        this.loadUserSettings();
-    }
-
-    loadUserSettings = () => {
-        const promiseResponse = axios.get("/api/userSettings")
-
-        promiseResponse.then((resp) => {
-            this.setState({
-                userSettings: resp.data
-            })
-        });
-
-        promiseResponse.catch((errResp) => {
-            this.setState({
-                userSettings: null
-            })
-        });
-    }
-
-    renderEmailAddress() {
-
-    }
-
     renderWhenLoggedIn() {
         return (
             <div>
-                You are currently logged in.
+                <p>You are currently logged in.</p>
 
                 <a href="/api/logout">Logout</a>
 
                 <h2>User Settings</h2>
-                <pre>{JSON.stringify(this.state.userSettings)}</pre>
+                <pre>{JSON.stringify(this.props.userSettings)}</pre>
 
             </div>
             
@@ -73,9 +44,11 @@ export default class Login extends React.Component {
 
 
     render() {
+        console.log(`I am the child rendering with ${JSON.stringify(this.props.userSettings)}`);
+
         return (
             <div className="gn-container">
-                {this.state.userSettings ? this.renderWhenLoggedIn() : this.renderWhenLoggedOut() }
+                {this.props.userSettings.isLoggedIn ? this.renderWhenLoggedIn() : this.renderWhenLoggedOut() }
             </div>
         )
 

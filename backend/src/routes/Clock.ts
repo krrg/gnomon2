@@ -25,14 +25,9 @@ export default class Clock implements IRouter {
 
         let router = express.Router();
 
-        router.get("/timestamps", (req, res) => {
-            if (req.query.senderId === undefined) {
-
-                return res.send(`You need to provide a senderId.`);
-            }
-            
-            this.gossipImpl.filterMessages(req.query.senderId).then((clockMessages:ReadonlyArray<string>) =>{
-                return res.send(`${clockMessages}`);
+        router.get("/timestamps/:senderId", (req, res) => {
+            this.gossipImpl.filterMessages(req.params.senderId).then((clockMessages:ReadonlyArray<string>) =>{
+                return res.send(clockMessages);
             });
         })
 
