@@ -30,6 +30,22 @@ describe("Redis Gossip implementation", () => {
 
     })
 
+    it("retrieves the last message", async () => {
+
+        const redis = new RedisGossip();
+
+        await _.times(10, async () => {
+            await redis.sendMessage({
+                senderId: "Glummy",
+                text: `This is a test ${Math.random()}`
+            })
+        });
+
+        console.log(await redis.filterLastMessage("Glummy"))
+
+
+    })
+
     it("publishes a message on the sender's channel", (done) => {
         const redis = new RedisGossip();
 

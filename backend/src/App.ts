@@ -9,6 +9,9 @@ import RedisGossip from "./gossip/RedisGossip";
 import Clock from "./routes/Clock";
 import Login from "./routes/Login";
 import Email from "./routes/Email";
+import UserSettings from "./routes/UserSettings";
+import Job from "./routes/Job";
+import UserSubscription from "./routes/UserSubscription";
 
 class App {
 
@@ -18,10 +21,11 @@ class App {
 
     constructor() {
         this.app = express();
+        this.gossipImpl = new RedisGossip();
+
         this.middleware();
         this.initRoutes();
 
-        this.gossipImpl = new RedisGossip();
     }
 
     private middleware(): void {
@@ -41,6 +45,9 @@ class App {
         router.use(new Clock(this.gossipImpl).routes());
         router.use(new Login().routes());
         router.use(new Email(this.gossipImpl).routes());
+        router.use(new UserSettings(this.gossipImpl).routes());
+        router.use(new Job(this.gossipImpl).routes());
+        router.use(new UserSubscription(this.gossipImpl).routes());
 
         this.app.use('/api', router);
 
