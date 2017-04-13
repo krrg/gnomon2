@@ -26,14 +26,6 @@ export default class Clock implements IRouter {
         let router = express.Router();
 
         router.get("/clockEvents", (req, res) => {
-            let email = null;
-            if (req.query.email === undefined) {
-                email = req.cookies["sessionEmail"]
-            }
-            if(email === undefined)
-            {
-                return res.send(`You are not logged in.`);
-            }
             if (req.query.senderId === undefined) {
 
                 return res.send(`You need to provide a senderId.`);
@@ -92,22 +84,80 @@ export default class Clock implements IRouter {
                 let clockMessage:IMessage;
                 clockMessage = this.createClockMessage(workerId, timestamp);
                 this.gossipImpl.sendMessage(clockMessage).then((indexOfMessage) =>{
-                    return res.send(`The clock message was sent successfully`);
+                    return res.send(`The clock event was sent successfully.`);
                 });
             })
+        });
+
+        router.post("/signClockEvent", (req, res) => {
+            let email = null;
+            if (req.query.email === undefined) {
+                email = req.cookies["sessionEmail"]
+            }
+            if(email === undefined)
+            {
+                return res.send(`You are not logged in.`);
+            }
+            if (req.query.messageId === undefined) {
+                return res.send(`You need to provide a messageId to sign.`);
+            }
+            if (req.query.senderId === undefined) {
+                return res.send(`You need to provide a senderId (the owner of the message, or previous signer).`);
+            }
+
+            this.userSettings.getSettings(email).then((userSettingsString:string) =>{
+                let myUserSettings:IUserSettingsFormat, signingId:string, messageId:string, senderId:string;
+                myUserSettings = JSON.parse(userSettingsString);
+                
+                signingId = myUserSettings.signing_id;
+                messageId = req.query.messageId;
+                senderId = req.query.senderId;
+
+                this.gossipImpl.filterMessages(senderId).then((clockMessages:ReadonlyArray<string>) =>{
+                    let clockMessage:IMessage, clockDataToSign:IClockFormat;
+                    clockDataToSign = this.findClockMessageWithId(clockMessages, senderId)
+                    if(clockDataToSign === null)
+                    {
+                        return res.send(`The clock event specified does not exist.`);
+                    }
+                    else{
+                        this.gossipImpl.sendMessage(clockMessage).then((indexOfMessage) =>{
+                            clockMessage = {senderId:signingId, text:JSON.stringify(clockDataToSign)};
+                            return res.send(`The clock event was signed successfully.`);
+                        });
+                    }
+
+                });
+            });
+
         });
 
         return router;
 
     }
 
-    private createClockMessage(workerId:string, timestamp:number):IMessage
+
+
+    private createClockMessage( workerId:string, timestamp:number):IMessage
     {
         let clockMessage:IMessage, clockInData:IClockFormat, message_id:string;
         message_id = this.createRandomId();
         clockInData = {worker_id:workerId, timestamp: timestamp, message_id:message_id};
         clockMessage = {senderId:workerId, text:JSON.stringify(clockInData)};
         return clockMessage;
+    }
+
+    private findClockMessageWithId(clockMessages:ReadonlyArray<string>, messageId:string):IClockFormat
+    {
+        clockMessages.forEach(clockMessage => {
+            let clockInData:IClockFormat;
+            clockInData = JSON.parse(clockMessage);
+            if(clockInData.message_id === messageId)
+            {
+                return clockInData;
+            }
+        });
+        return null;
     }
 
     private createRandomId():string
