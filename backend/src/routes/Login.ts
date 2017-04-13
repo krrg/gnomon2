@@ -13,7 +13,7 @@ export default class LoginRouter implements IRouter {
             } else {
                 const email = req.query.email;
 
-                if(email === undefined)
+                if(!email)
                 {
                     return res.send(`The email parameter is missing`);
                 }

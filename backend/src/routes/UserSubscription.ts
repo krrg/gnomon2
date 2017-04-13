@@ -23,11 +23,11 @@ export default class UserSubscriptionRouter implements IRouter {
         let router = express.Router();
 
         router.get("/userSubscription", (req, res) => {
-            let email = null;
-            if (req.query.email === undefined) {
+            let email = req.query.email;
+            if (!email) {
                 email = req.cookies["sessionEmail"]
             }
-            if(email === undefined)
+            if(!email)
             {
                 return res.send(`You are not logged in.`);
             }
@@ -41,11 +41,11 @@ export default class UserSubscriptionRouter implements IRouter {
         })
 
         router.post("/userSubscription", (req, res) => {
-            let email = null;
-            if (req.query.email === undefined) {
+            let email = req.query.email;
+            if (!email) {
                 email = req.cookies["sessionEmail"]
             }
-            if(email === undefined)
+            if(!email)
             {
                 return res.send(`You are not logged in.`);
             }

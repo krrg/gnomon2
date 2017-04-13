@@ -24,11 +24,11 @@ export default class JobRouter implements IRouter {
         let router = express.Router();
 
         router.get("/jobs", (req, res) => {
-            let email = null;
-            if (req.query.email === undefined) {
+            let email = req.query.email;
+            if (!email) {
                 email = req.cookies["sessionEmail"]
             }
-            if(email === undefined)
+            if(!email)
             {
                 return res.send(`You are not logged in.`);
             }
@@ -42,11 +42,11 @@ export default class JobRouter implements IRouter {
         })
 
         router.post("/job", (req, res) => {
-            let email = null;
-            if (req.query.email === undefined) {
+            let email = req.query.email;
+            if (!email) {
                 email = req.cookies["sessionEmail"]
             }
-            if(email === undefined)
+            if(!email)
             {
                 return res.send(`You are not logged in.`);
             }
