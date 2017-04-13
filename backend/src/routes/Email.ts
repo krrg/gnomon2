@@ -19,13 +19,22 @@ export default class Email implements IRouter {
         this.gossipImpl = gossip;
         this.subscriptions = {};
         this.redis = new RedisGossip();
-        this.transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: Settings.Email.username,
-                pass: Settings.Email.password
+
+        let cachedTransporter = null;
+        this.transporter = () => {
+            if (cachedTransporter) {
+                return cachedTransporter;
             }
-        });
+
+            cachedTransporter = nodemailer.createTransport({
+                service: 'gmail',
+                    auth: {
+                        user: Settings["Email"].username,
+                        pass: Settings["Email"].password
+                    }
+                });
+            return cachedTransporter;
+        }
 
         //Uncomment below to test emailer... but don't send emails to me
         // this.sendEmail("cwig5945@gmail.com", "You got and email", "Here is a message");
@@ -38,7 +47,7 @@ export default class Email implements IRouter {
             subject: subject,
             text: message
         };
-        this.transporter.sendMail(mailOptions, (error, info) => {
+        this.transporter().sendMail(mailOptions, (error, info) => {
             if (error) {
                 return console.log(error);
             }

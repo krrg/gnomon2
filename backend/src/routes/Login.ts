@@ -8,27 +8,37 @@ export default class LoginRouter implements IRouter {
 // https://accounts.google.com/o/oauth2/auth
 // https://accounts.google.com/o/oauth2/token
 
-    private oauth2: any;
-    private authorization_uri: any;
+    private oauth2: () => any;
+    private authorization_uri: () => string;
 
     constructor() {
 
-        const credentials = {
-          client: {
-            id: Settings.Login.client_id,
-            secret: Settings.Login.client_secret
-          },
-          auth: {
-            tokenHost: 'https://accounts.google.com',
-            tokenPath: '/o/oauth2/token',
-            authorizePath: '/o/oauth2/auth'
-          }
-        };
+        let cachedOauth2 = null;
+        this.oauth2 = () => {
+            /* This is a function so that we can lazily evaluate the Settings file */
 
-        this.oauth2 = require('simple-oauth2').create(credentials);
+            if (cachedOauth2) {
+                return cachedOauth2;
+            }
 
-        this.authorization_uri = this.oauth2.authorizationCode.authorizeURL({
-            redirect_uri: Settings.Login.auth_return_url,
+            const credentials = {
+            client: {
+                    id: Settings["Login"].client_id,
+                    secret: Settings["Login"].client_secret,
+                },
+                auth: {
+                    tokenHost: 'https://accounts.google.com',
+                    tokenPath: '/o/oauth2/token',
+                    authorizePath: '/o/oauth2/auth'
+                }
+            };
+
+            cachedOauth2 = require('simple-oauth2').create(credentials)
+            return cachedOauth2;
+        }
+
+        this.authorization_uri = () => this.oauth2().authorizationCode.authorizeURL({
+            redirect_uri: Settings["Login"].auth_return_url,
             scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'
         });
     }
@@ -56,7 +66,7 @@ export default class LoginRouter implements IRouter {
         });
 
         router.get('/auth', (req, res) => {
-            res.redirect(this.authorization_uri);
+            res.redirect(this.authorization_uri());
         });
 
         router.get('/login/return', (req, res) => {
@@ -64,15 +74,15 @@ export default class LoginRouter implements IRouter {
             let code = req.query.code;
             const tokenConfig = {
                 code: code,
-                redirect_uri: Settings.Login.auth_return_url
+                redirect_uri: Settings["Login"].auth_return_url
             };
             let self = this;
-            this.oauth2.authorizationCode.getToken(tokenConfig, (error, result) => {
+            this.oauth2().authorizationCode.getToken(tokenConfig, (error, result) => {
                 if (error) {
                     return console.log('Access Token Error', error.message);
                 }
 
-                const token = self.oauth2.accessToken.create(result);
+                const token = self.oauth2().accessToken.create(result);
                 const options = {
                     url: 'https://www.googleapis.com/oauth2/v1/userinfo',
                     headers: {
