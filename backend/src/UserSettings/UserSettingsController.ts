@@ -1,7 +1,7 @@
 import IGossip from "../gossip/IGossip";
 import {IMessage} from "../gossip/IGossip";
 import IUserSettingsFormat from "./IUserSettingsFormat";
-import Guid from "../utils/Guid"
+import Guid from "../Utils/Guid"
 import * as Redis from "ioredis"
 
 export default class UserSettingsController {

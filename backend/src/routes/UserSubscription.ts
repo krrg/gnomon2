@@ -22,7 +22,7 @@ export default class UserSubscriptionRouter implements IRouter {
 
         let router = express.Router();
 
-        router.get("/userSubscription", (req, res) => {
+        router.get("/userSubscriptions", (req, res) => {
             let email = req.query.email;
             if (!email) {
                 email = req.cookies["sessionEmail"]
@@ -40,8 +40,8 @@ export default class UserSubscriptionRouter implements IRouter {
             })
         })
 
-        router.post("/userSubscription", (req, res) => {
-            let email = req.body.email, subscriptionId = req.body["subscriptionId"];
+        router.post("/userSubscriptions", (req, res) => {
+            let email = req.body["email"], subscriptionId = req.body["subscriptionId"];
             if (!email) {
                 email = req.cookies["sessionEmail"]
             }
@@ -49,7 +49,6 @@ export default class UserSubscriptionRouter implements IRouter {
                 return res.send(`You are not logged in.`);
             }
             if (!subscriptionId) {
-                console.log(req.body)
                 return res.send(`You need to provide a subscriptionId.`);
             }
 

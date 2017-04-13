@@ -41,8 +41,8 @@ export default class JobRouter implements IRouter {
             })
         })
 
-        router.post("/job", (req, res) => {
-            let email = req.params.email;
+        router.post("/jobs", (req, res) => {
+            let email = req.body["email"];
             if (!email) {
                 email = req.cookies["sessionEmail"]
             }
