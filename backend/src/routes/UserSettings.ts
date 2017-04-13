@@ -1,8 +1,8 @@
 import * as express from "express";
 import IRouter from "./IRouter";
 import IGossip from "../gossip/IGossip";
-import UserSettingsController from "../UserSettings/UserSettingsController"
-import IUserSettingsFormat from "../UserSettings/IUserSettingsFormat";
+import UserSettingsController from "../usersettings/UserSettingsController"
+import IUserSettingsFormat from "../usersettings/IUserSettingsFormat";
 
 export default class UserSettingsRouter implements IRouter {
 

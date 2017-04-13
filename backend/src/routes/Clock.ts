@@ -5,11 +5,11 @@ import * as cookieParser from 'cookie-parser';
 
 import IRouter from "./IRouter";
 import IGossip from "../gossip/IGossip";
-import UserSettingsController from "../UserSettings/UserSettingsController"
-import IUserSettingsFormat from "../UserSettings/IUserSettingsFormat";
+import UserSettingsController from "../usersettings/UserSettingsController"
+import IUserSettingsFormat from "../usersettings/IUserSettingsFormat";
 import {IMessage} from "../gossip/IGossip";
 import Guid from "../utils/Guid"
-import IClockFormat from "../Clock/IClockFormat"
+import IClockFormat from "../clock/IClockFormat"
 
 export default class Clock implements IRouter {
 
