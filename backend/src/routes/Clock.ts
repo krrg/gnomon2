@@ -149,10 +149,10 @@ export default class Clock implements IRouter {
                     clockDataThatIsSigned = this.findClockMessageWithId(signedMessages, messageId)
                     if(clockDataThatIsSigned === null)
                     {
-                        return res.send(`no`);
+                        return res.send({signed: false});
                     }
                     else{
-                        return res.send(`yes`);
+                        return res.send({signed: true});
                     }
 
                 });
