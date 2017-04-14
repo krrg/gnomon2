@@ -1,6 +1,8 @@
 import React from "react";
 import axios from "axios";
 
+import ClockEventsTable from "./ClockEventsTable";
+
 export default class Timesheet extends React.Component {
 
     constructor() {
@@ -46,41 +48,10 @@ export default class Timesheet extends React.Component {
         )
     }
 
-    renderClockEventsFor = (workerId) => {
-        const clockEvents = this.state.timestamps[workerId] || []
-
-        if (clockEvents.length === 0) {
-            return <p>No recorded timestamps for this job</p>
-        }
-
-        let timePairs = [];
-        for (let i = 0; i < clockEvents.length; i += 2) {
-            timePairs.push([
-                clockEvents[i],
-                clockEvents[i+1] /* this will be undefined in event of mismatched clocks */
-            ])
-        }
-
-        return timePairs.map((pair) => {
-            const clockIn = pair[0].timestamp;
-            const clockOut = pair[1] ? pair[1].timestamp : null;
-            const key = pair[0].message_id;
-
-            return (
-                <tr key={key}>
-                    <td>{clockIn}</td>
-                    <td>{clockOut}</td>
-                </tr>
-            )
-        })
-    }
-
     renderWorkerIds = () => {
         const jobIds = this.getJobIds();
 
         if (jobIds.length > 0) {
-            console.log("Here i am");
-            console.log(jobIds);
             return this.props.userSettings["jobs"].map((jobid) => {
                 return (
                     <div key={jobid}>
@@ -89,12 +60,10 @@ export default class Timesheet extends React.Component {
                             {this.renderClockButton(jobid)}
                         </p>
 
-                        <table>
-                            <thead><tr><th>In</th><th>Out</th></tr></thead>
-                            <tbody>
-                                {this.renderClockEventsFor(jobid)}
-                            </tbody>
-                        </table>
+                        <ClockEventsTable 
+                            jobid={jobid} 
+                            timestamps={this.state.timestamps[jobid]}
+                        />
 
                         <hr />
                     </div>
@@ -111,8 +80,7 @@ export default class Timesheet extends React.Component {
         axios.post("/api/jobs").then((resp) => {
             console.log("here it is");
             this.props.userSettings.requestReload();
-        })
-
+        });
     }
 
     render() {
@@ -127,8 +95,6 @@ export default class Timesheet extends React.Component {
                     <button onClick={this.handleCreateNewJob}>Create new Job</button>
 
                 </div>
-
-
 
             </div>
         )
