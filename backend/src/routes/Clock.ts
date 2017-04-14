@@ -125,6 +125,41 @@ export default class Clock implements IRouter {
 
         });
 
+        router.post("/timestamps/:messageId/isSigned", (req, res) => {
+            let email = req.body["email"], messageId = req.params.messageId
+            if (!email) {
+                email = req.cookies["sessionEmail"]
+            }
+            if(!email)
+            {
+                return res.send(`You are not logged in.`);
+            }
+            if (!messageId) {
+                return res.send(`You need to provide a messageId to sign.`);
+            }
+
+            this.userSettings.getSettings(email).then((userSettingsString:string) =>{
+                let myUserSettings:IUserSettingsFormat, signingId:string;
+                myUserSettings = JSON.parse(userSettingsString);
+                
+                signingId = myUserSettings.signing_id;
+
+                this.gossipImpl.filterMessages(signingId).then((signedMessages:ReadonlyArray<string>) =>{
+                    let signedMessage:IMessage, clockDataThatIsSigned:IClockFormat;
+                    clockDataThatIsSigned = this.findClockMessageWithId(signedMessages, messageId)
+                    if(clockDataThatIsSigned === null)
+                    {
+                        return res.send(`no`);
+                    }
+                    else{
+                        return res.send(`yes`);
+                    }
+
+                });
+            });
+
+        });
+
         return router;
 
     }

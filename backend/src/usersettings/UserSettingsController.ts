@@ -20,7 +20,7 @@ export default class UserSettingsController {
         if(currentSettings === null)
         {
             let newUserSettings:IUserSettingsFormat, indexOfMessage:number;
-            newUserSettings = this.createInitialSettings();
+            newUserSettings = this.createInitialSettings(email);
             indexOfMessage = await this.UpdateSettingsObject(email,newUserSettings);
             return this.getSettings(email)
         }
@@ -68,10 +68,10 @@ export default class UserSettingsController {
         return await this.gossipImpl.sendMessage(settingsMessage);
     }
 
-    private createInitialSettings(): IUserSettingsFormat{
+    private createInitialSettings(userEmail:string): IUserSettingsFormat{
         let defaultSettings:IUserSettingsFormat, newSenderId:string;
         newSenderId = this.createRandomId();
-        defaultSettings = {signing_id:newSenderId, jobs: new Array<string>(), subscriptions:new Array<string>()};
+        defaultSettings = {email:userEmail, signing_id:newSenderId, jobs: new Array<string>(), subscriptions:new Array<string>()};
         return defaultSettings;
     }
     private createRandomId():string
