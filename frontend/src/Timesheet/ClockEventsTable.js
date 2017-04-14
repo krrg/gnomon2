@@ -12,11 +12,14 @@ export default class ClockEventsTable extends React.Component {
             return this.props.renderClockEventRow(workerId, clockIn, clockOut);
         }
 
+        const clockInDate = clockIn ? new Date(clockIn).toTimeString() : null;
+        const clockOutDate = clockOut ? new Date(clockOut).toTimeString() : null;
+
         /* Or default to a minimal output */
         return (
             <tr key={`${clockIn + clockOut}`}>
-                <td>{clockIn}</td>
-                <td>{clockOut}</td>
+                <td>{clockInDate}</td>
+                <td>{clockOutDate}</td>
             </tr>
         );
     }
