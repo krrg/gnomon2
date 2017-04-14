@@ -84,11 +84,12 @@ export default class Approvals extends React.Component {
     }
 
     customRenderTimestampRow = (workerId, clockIn, clockOut) => {
+        console.log(this.state);
 
         const clockInDate = clockIn ? new Date(clockIn.timestamp).toTimeString() : null;
         const clockOutDate = clockOut ? new Date(clockOut.timestamp).toTimeString() : null;
         
-        const approved = this.isApproved(clockIn.message_id) && this.isApproved(clockOut.message_id);
+        const approved = clockIn && clockOut && this.isApproved(clockIn.message_id) && this.isApproved(clockOut.message_id);
         
         const handleRowApproval = () => {
             this.approveTimestamp(clockIn.message_id, workerId);
