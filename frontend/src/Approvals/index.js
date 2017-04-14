@@ -53,7 +53,11 @@ export default class Approvals extends React.Component {
             return (
                 <div key={sid}>
                     <h3>Subscription ID: {sid}</h3>
-                    {JSON.stringify(this.state.timestamps[sid])}
+                    {/*{JSON.stringify(this.state.timestamps[sid])}*/}
+                    <ClockEventsTable 
+                        jobid={jobid} 
+                        timestamps={this.state.timestamps[jobid]}
+                    />
                 </div>
             )
         })

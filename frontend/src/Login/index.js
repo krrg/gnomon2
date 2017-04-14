@@ -15,8 +15,6 @@ export default class Login extends React.Component {
                 <pre>{JSON.stringify(this.props.userSettings)}</pre>
 
             </div>
-            
-
         )
     }
 

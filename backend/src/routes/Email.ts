@@ -80,7 +80,7 @@ export default class Email implements IRouter {
             return;
         }
 
-        workerIds = this.subscriptions[msg['senderId']]
+        const workerIds = this.subscriptions[msg['senderId']]
         if(workerIds && msg['workerId'] in workerIds) {
             //Maybe send an email here...
         }
@@ -90,7 +90,8 @@ export default class Email implements IRouter {
     routes(): Router {
         const router = Router();
 
-        router.post("/subscriptions", (req, res) => {
+        router.post("/subscriptions/:email", (req, res) => {
+            const email = req.params.email;
             let body = req.body;
             let subscribe = body["subscribe"]
             let senderId = body["senderId"];
