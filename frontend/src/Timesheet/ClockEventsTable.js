@@ -12,12 +12,12 @@ export default class ClockEventsTable extends React.Component {
             return this.props.renderClockEventRow(workerId, clockIn, clockOut);
         }
 
-        const clockInDate = clockIn ? new Date(clockIn).toTimeString() : null;
-        const clockOutDate = clockOut ? new Date(clockOut).toTimeString() : null;
+        const clockInDate = clockIn ? new Date(clockIn.timestamp).toTimeString() : null;
+        const clockOutDate = clockOut ? new Date(clockOut.timestamp).toTimeString() : null;
 
         /* Or default to a minimal output */
         return (
-            <tr key={`${clockIn + clockOut}`}>
+            <tr key={`${clockIn.message_id}`}>
                 <td>{clockInDate}</td>
                 <td>{clockOutDate}</td>
             </tr>
@@ -37,10 +37,8 @@ export default class ClockEventsTable extends React.Component {
         }
 
         return timePairs.map((pair) => {
-            const clockIn = pair[0].timestamp;
-            const clockOut = pair[1] ? pair[1].timestamp : null;
-            const key = pair[0].message_id;
-
+            const clockIn = pair[0]
+            const clockOut = pair[1] || null;
             return this.renderClockEventRow(workerId, clockIn, clockOut);
         })
     }
