@@ -14,7 +14,7 @@ export default class ClockEventsTable extends React.Component {
 
         /* Or default to a minimal output */
         return (
-            <tr key={key}>
+            <tr key={`${clockIn + clockOut}`}>
                 <td>{clockIn}</td>
                 <td>{clockOut}</td>
             </tr>
@@ -38,7 +38,7 @@ export default class ClockEventsTable extends React.Component {
             const clockOut = pair[1] ? pair[1].timestamp : null;
             const key = pair[0].message_id;
 
-            return this.props.renderClockEventRow(workerId, clockIn, clockOut);
+            return this.renderClockEventRow(workerId, clockIn, clockOut);
         })
     }
 

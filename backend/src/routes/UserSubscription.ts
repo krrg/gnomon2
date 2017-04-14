@@ -29,7 +29,7 @@ export default class UserSubscriptionRouter implements IRouter {
             }
             if(!email)
             {
-                return res.send(`You are not logged in.`);
+                return res.status(401).send(`You are not logged in.`);
             }
 
             this.userSettings.getSettings(email).then((userSettingsString:string) =>{
@@ -46,10 +46,10 @@ export default class UserSubscriptionRouter implements IRouter {
                 email = req.cookies["sessionEmail"]
             }
             if(!email){
-                return res.send(`You are not logged in.`);
+                return res.status(401).send(`You are not logged in.`);
             }
             if (!subscriptionId) {
-                return res.send(`You need to provide a subscriptionId.`);
+                return res.status(400).send(`You need to provide a subscriptionId.`);
             }
 
             this.userSettings.insertNewSubscriptionId(email,subscriptionId).then((result:string) =>{
