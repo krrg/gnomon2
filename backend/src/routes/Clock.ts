@@ -125,14 +125,14 @@ export default class Clock implements IRouter {
 
         });
 
-        router.post("/timestamps/:messageId/isSigned", (req, res) => {
-            let email = req.body["email"], messageId = req.params.messageId
+        router.get("/timestamps/:messageId/isSigned", (req, res) => {
+            let email = req.query.email, messageId = req.params.messageId;
             if (!email) {
                 email = req.cookies["sessionEmail"]
             }
             if(!email)
             {
-                return res.send(`You are not logged in.`);
+                return res.status(401).send();
             }
             if (!messageId) {
                 return res.send(`You need to provide a messageId to sign.`);
