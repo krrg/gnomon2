@@ -55,36 +55,55 @@ export default class Email implements IRouter {
         });
     }
 
-    subscribe(email: string): void {
-        this.subscriptions[email] = true;
-        this.redis.subscribeToSender(email, this.handleMessage)
+    subscribe(senderId: string, workerId): void {
+        if(!(senderId in this.subscriptions)) {
+            this.subscriptions[senderId] = {}
+        }
+        this.subscriptions[senderId][workerId] = true;
+        this.redis.subscribeToSender(senderId, this.handleMessage)
     }
 
-    unsubscribe(email: string): void {
-        delete this.subscriptions[email];
-        //TODO: Add unsubscribe option
+    unsubscribe(senderId: string, workerId): void {
+        if(senderId in this.subscriptions) {
+            delete this.subscriptions[senderId][workerId];
+
+            if(Object.keys(this.subscriptions[senderId]).length == 0) {
+                delete this.subscriptions[senderId];
+                //TODO: Add unsubscribe option
+            }
+        }
     }
 
     handleMessage(msg): void {
+
+        if(!("senderId" in msg) || !("workerId" in msg)) {
+            return;
+        }
+
+        workerIds = this.subscriptions[msg['senderId']]
+        if(workerIds && msg['workerId'] in workerIds) {
+            //Maybe send an email here...
+        }
         console.log(msg)
     }
 
     routes(): Router {
         const router = Router();
 
-        router.post("/subscriptions/:email", (req, res) => {
+        router.post("/subscriptions", (req, res) => {
             let body = req.body;
             let subscribe = body["subscribe"]
-            let email = req.params.email;
+            let senderId = body["senderId"];
+            let workerId = body["workerId"];
             if(subscribe) {
-                this.subscribe(email)
+                this.subscribe(senderId, workerId)
                 let return_obj =  {
                     "msg": `Emails will be sent regarding messages with Sender Id: ${email}`
                 }
                 res.send(return_obj);
             }
             else {
-                this.unsubscribe(email)
+                this.unsubscribe(senderId, workerId)
                 let return_obj =  {
                     "msg": `Sender Id has now been unsubscribed: ${email}`
                 }
