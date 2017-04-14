@@ -55,7 +55,7 @@ export default class LoginRouter implements IRouter {
 
                 if(!email)
                 {
-                    return res.send(`The email parameter is missing`);
+                    return res.status(400).send(`The email parameter is missing`);
                 }
 
                 /* Dump a completely insecure garbage cookie over */

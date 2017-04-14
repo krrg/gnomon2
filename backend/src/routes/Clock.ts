@@ -38,7 +38,7 @@ export default class Clock implements IRouter {
             }
             if(!email)
             {
-                return res.send(`You are not logged in.`);
+                return res.status(401).send(`You are not logged in.`);
             }
 
             if (!timestamp) {
@@ -49,7 +49,7 @@ export default class Clock implements IRouter {
                 timestamp = parseInt(timestamp)
                 if(isNaN(timestamp))
                 {
-                    return res.send(`The timestamp provided is not a number.`);
+                    return res.status(400).send(`The timestamp provided is not a number.`);
                 }
             }
 
@@ -64,14 +64,14 @@ export default class Clock implements IRouter {
                         workerId = myUserSettings.jobs[0]
                     }
                     else{
-                        return res.send(`You have no jobs to clock in from.`);
+                        return res.status(400).send(`You have no jobs to clock in from.`);
                     }
                 }
                 else
                 {
                     if(myUserSettings.jobs.indexOf(workerId) === -1)
                     {
-                        return res.send(`You have do not have a job with that id.`);
+                        return res.status(400).send(`You have do not have a job with that id.`);
                     }
                 }
                 //workerId is valid
@@ -90,13 +90,13 @@ export default class Clock implements IRouter {
             }
             if(!email)
             {
-                return res.send(`You are not logged in.`);
+                return res.status(401).send(`You are not logged in.`);
             }
             if (!messageId) {
-                return res.send(`You need to provide a messageId to sign.`);
+                return res.status(400).send(`You need to provide a messageId to sign.`);
             }
             if (!senderId) {
-                return res.send(`You need to provide a senderId (the owner of the message, or previous signer).`);
+                return res.status(400).send(`You need to provide a senderId (the owner of the message, or previous signer).`);
             }
 
             this.userSettings.getSettings(email).then((userSettingsString:string) =>{
@@ -111,7 +111,7 @@ export default class Clock implements IRouter {
 
                     if(clockDataToSign === null)
                     {
-                        return res.send(`The clock event specified does not exist.`);
+                        return res.status(400).send(`The clock event specified does not exist.`);
                     }
                     else{
                         clockMessage = {senderId:signingId, text:JSON.stringify(clockDataToSign)};
@@ -135,7 +135,7 @@ export default class Clock implements IRouter {
                 return res.status(401).send();
             }
             if (!messageId) {
-                return res.send(`You need to provide a messageId to sign.`);
+                return res.status(400).send(`You need to provide a messageId to sign.`);
             }
 
             this.userSettings.getSettings(email).then((userSettingsString:string) =>{
