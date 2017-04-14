@@ -27,12 +27,12 @@ export default class Clock implements IRouter {
 
         router.get("/timestamps/:senderId", (req, res) => {
             this.gossipImpl.filterMessages(req.params.senderId).then((clockMessages:ReadonlyArray<string>) =>{
-                return res.send(clockMessages);
+                return res.send(clockMessages.map((msg) => {return JSON.parse(msg)}));
             });
         })
 
-        router.post("/timestamps", (req, res) => {
-            let email = req.body["email"], timestamp = req.body["timestamp"], workerId=req.body["workerId"];
+        router.post("/timestamps/:workerId", (req, res) => {
+            let email = req.body["email"], timestamp = req.body["timestamp"], workerId=req.params["workerId"];
             if (!email) {
                 email = req.cookies["sessionEmail"]
             }
