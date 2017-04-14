@@ -53,24 +53,25 @@ export default class Timesheet extends React.Component {
             return <p>No recorded timestamps for this job</p>
         }
 
-        // Divide these 
         let timePairs = [];
         for (let i = 0; i < clockEvents.length; i += 2) {
             timePairs.push([
                 clockEvents[i],
-                clockEvents[i+1]
+                clockEvents[i+1] /* this will be undefined in event of mismatched clocks */
             ])
         }
 
-        return clockEvents.map((timestamp, index) => {
-            // const wasClockIn = index % 2 == 0;
-            // const hasNextEntry = index !== clockEvents.length - 1;
+        return timePairs.map((pair) => {
+            const clockIn = pair[0].timestamp;
+            const clockOut = pair[1] ? pair[1].timestamp : null;
+            const key = pair[0].message_id;
 
-            // if (wasClockIn && hasNextEntry) {
-
-            // }
-
-            return <p key={timestamp["message_id"]}>Time: {JSON.stringify(timestamp)}, Index: {index}</p>
+            return (
+                <tr key={key}>
+                    <td>{clockIn}</td>
+                    <td>{clockOut}</td>
+                </tr>
+            )
         })
     }
 
@@ -88,9 +89,14 @@ export default class Timesheet extends React.Component {
                             {this.renderClockButton(jobid)}
                         </p>
 
-                        <hr />
+                        <table>
+                            <thead><tr><th>In</th><th>Out</th></tr></thead>
+                            <tbody>
+                                {this.renderClockEventsFor(jobid)}
+                            </tbody>
+                        </table>
 
-                        {this.renderClockEventsFor(jobid)}
+                        <hr />
                     </div>
                 );
             });
