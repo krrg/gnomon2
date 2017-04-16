@@ -12,12 +12,14 @@ export default class Email implements IRouter {
 
     private gossipImpl: IGossip;
     private subscriptions: {};
+    private cachedMessages: {};
     private redis: any;
     private transporter: any;
 
     constructor(gossip: IGossip) {
         this.gossipImpl = gossip;
         this.subscriptions = {};
+        this.cachedMessages = {};
         this.redis = new RedisGossip();
 
         let cachedTransporter = null;
@@ -55,58 +57,89 @@ export default class Email implements IRouter {
         });
     }
 
-    subscribe(senderId: string, workerId): void {
+    subscribe(email: string, senderId: string, workerId): void {
         if(!(senderId in this.subscriptions)) {
             this.subscriptions[senderId] = {}
         }
-        this.subscriptions[senderId][workerId] = true;
-        this.redis.subscribeToSender(senderId, this.handleMessage)
-    }
-
-    unsubscribe(senderId: string, workerId): void {
-        if(senderId in this.subscriptions) {
-            delete this.subscriptions[senderId][workerId];
-
-            if(Object.keys(this.subscriptions[senderId]).length == 0) {
-                delete this.subscriptions[senderId];
-                //TODO: Add unsubscribe option
-            }
+        if(!(workerId in this.subscriptions[senderId])){
+            this.subscriptions[senderId][workerId] = {};
         }
+        this.subscriptions[senderId][workerId][email] = [];
+
+        this.redis.subscribeToSender(senderId, this.handleMessage);
     }
 
-    handleMessage(msg): void {
+    unsubscribe(email: string, senderId: string, workerId: string): void {
 
-        if(!("senderId" in msg) || !("workerId" in msg)) {
+        // if(senderId in this.subscriptions) {
+        //     delete this.subscriptions[senderId][workerId];
+        //
+        //     if(Object.keys(this.subscriptions[senderId]).length == 0) {
+        //         delete this.subscriptions[senderId];
+        //         //TODO: Add unsubscribe option
+        //     }
+        // }
+    }
+
+    sendMessage(email, senderId, workerId): void {
+        const msgs = this.subscriptions[senderId][workerId][email];
+        let buildString = "";
+        buildString += "Time Report\n";
+        buildString += "\n";
+        buildString += `Approval Id: ${senderId}\n`;
+        buildString += `Worker Id: ${workerId}\n`;
+        buildString += "Time Events:\n"
+        for (let msg of msgs) {
+            buildString += msg+"\n";
+        }
+        this.sendEmail(email, "Time Report", buildString);
+    }
+    // handleMessage(msg): void {
+    handleMessage = (msg) => {
+        const senderId = msg.senderId;
+        const workerIds = this.subscriptions[senderId];
+        const msg_text = JSON.parse(msg.text)
+        const workerId = msg_text['worker_id']
+        if(!workerIds || !(workerId in workerIds)) {
             return;
         }
 
-        const workerIds = this.subscriptions[msg['senderId']]
-        if(workerIds && msg['workerId'] in workerIds) {
-            //Maybe send an email here...
+        const emails = workerIds[workerId]
+
+        for (let email in emails) {
+            if (emails.hasOwnProperty(email)) {
+                const cnt = emails[email].length;
+                if(cnt >= 10) {
+                    this.sendMessage(email, senderId, workerId);
+                    emails[email] = [];
+                }
+                else {
+                    emails[email].push(msg_text['timestamp'])
+                }
+            }
         }
-        console.log(msg)
     }
 
     routes(): Router {
         const router = Router();
 
-        router.post("/subscriptions/:email", (req, res) => {
-            const email = req.params.email;
+        router.post("/subscriptions", (req, res) => {
             let body = req.body;
-            let subscribe = body["subscribe"]
-            let senderId = body["senderId"];
-            let workerId = body["workerId"];
+            const email = body["email"];
+            const subscribe = body["subscribe"]
+            const senderId = body["senderId"];
+            const workerId = body["workerId"];
             if(subscribe) {
-                this.subscribe(senderId, workerId)
+                this.subscribe(email, senderId, workerId)
                 let return_obj =  {
-                    "msg": `Emails will be sent regarding messages with Sender Id: ${email}`
+                    "msg": `Emails will be sent to: ${email}`
                 }
                 res.send(return_obj);
             }
             else {
-                this.unsubscribe(senderId, workerId)
+                this.unsubscribe(email, senderId, workerId)
                 let return_obj =  {
-                    "msg": `Sender Id has now been unsubscribed: ${email}`
+                    "msg": `This feature is not actually implemented`
                 }
                 res.send(return_obj);
             }
@@ -124,6 +157,4 @@ export default class Email implements IRouter {
 
         return router;
     }
-
-
 }
