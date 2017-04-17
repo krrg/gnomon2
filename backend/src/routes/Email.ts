@@ -128,7 +128,17 @@ export default class Email implements IRouter {
 
             console.log("Here is the body: ", JSON.stringify(body));
 
-            const email = body["email"];
+            let email = req.query.email;
+            if (!email) {
+                email = req.cookies["sessionEmail"]
+            }
+            if (!email) {
+                email = body["email"];
+            }
+            if(!email)
+            {
+                return res.status(401).send(`You are not logged in.`);
+            }
             const subscribe = body["subscribe"]
             const senderId = body["senderId"];
             const workerId = body["workerId"];
