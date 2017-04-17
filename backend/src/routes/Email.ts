@@ -142,9 +142,19 @@ export default class Email implements IRouter {
 
         router.get("/subscriptions", (req, res) => {
             let keys = [];
-            for (let key in this.subscriptions) {
-                if (this.subscriptions.hasOwnProperty(key)) {
-                    keys.push(key);
+            let email = "";
+            for (let senderId in this.subscriptions) {
+                if (this.subscriptions.hasOwnProperty(senderId)) {
+                    for (let workerId in this.subscriptions[senderId]) {
+                        if (this.subscriptions[senderId].hasOwnProperty(workerId)) {
+                            if (email in this.subscriptions[senderId][workerId]) {
+                                keys.push({
+                                    "workerId": workerId,
+                                    "senderId": senderId
+                                })
+                            }
+                        }
+                    }
                 }
             }
             res.send(keys);
