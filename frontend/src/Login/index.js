@@ -28,14 +28,14 @@ export default class Login extends React.Component {
                     <a href="/api/login">Google</a>
                 </div>
 
-                <div>
+                {/*<div>
                     <h2>Login through Debug Backdoor</h2>
                     <p>Cross-site Request Forgers please use this</p>
                     <form ref='login-backdoor' method='get' action='/api/login'>
                         <input type='text' name='email' placeholder="email@example.com"/>
                         <button type='submit'>Backdoor Login</button>
                     </form>
-                </div>
+                </div>*/}
             </div>
         )
     }
