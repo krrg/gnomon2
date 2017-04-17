@@ -10,10 +10,19 @@ export default class Emails extends React.Component {
             subscriptions: []
         }
 
-        axios.get(`/api/subscriptions`)
-            .then((sub) => {
-                this.state.subscriptions = sub;
-            })
+
+    }
+
+    renderSubscriptionForm = () => {
+        return (
+            <div>
+                
+            </div>
+        )
+    }
+
+    renderSubscriptionList = () => {
+
     }
 
     render() {

@@ -125,24 +125,19 @@ export default class Email implements IRouter {
 
         router.post("/subscriptions", (req, res) => {
             let body = req.body;
+
+            console.log("Here is the body: ", JSON.stringify(body));
+
             const email = body["email"];
             const subscribe = body["subscribe"]
             const senderId = body["senderId"];
             const workerId = body["workerId"];
-            if(subscribe) {
-                this.subscribe(email, senderId, workerId)
-                let return_obj =  {
-                    "msg": `Emails will be sent to: ${email}`
-                }
-                res.send(return_obj);
+            this.subscribe(email, senderId, workerId)
+            let return_obj =  {
+                "msg": `Emails will be sent to: ${email}`
             }
-            else {
-                this.unsubscribe(email, senderId, workerId)
-                let return_obj =  {
-                    "msg": `This feature is not actually implemented`
-                }
-                res.send(return_obj);
-            }
+            res.send(return_obj);
+
         })
 
         router.get("/subscriptions", (req, res) => {

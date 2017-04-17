@@ -49,7 +49,7 @@ export default class LoginRouter implements IRouter {
 
         router.get('/login', (req, res) => {
             if (req.query.email === undefined) {
-                return res.send(`I am logging you in through Gmail`)
+                return res.redirect(this.authorization_uri());
             } else {
                 const email = req.query.email;
 
