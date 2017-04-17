@@ -142,7 +142,14 @@ export default class Email implements IRouter {
 
         router.get("/subscriptions", (req, res) => {
             let keys = [];
-            let email = "";
+            let email = req.query.email;
+            if (!email) {
+                email = req.cookies["sessionEmail"]
+            }
+            if(!email)
+            {
+                return res.status(401).send(`You are not logged in.`);
+            }
             for (let senderId in this.subscriptions) {
                 if (this.subscriptions.hasOwnProperty(senderId)) {
                     for (let workerId in this.subscriptions[senderId]) {
